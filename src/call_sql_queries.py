@@ -7,7 +7,11 @@ from check_bucket_params import *
 from bucket_orders import *
 
 import sqlite3
-conn = sqlite3.connect("../data/analysis.db")
+
+DB_PATH = Path(__file__).resolve().parents[1] / "data" / "analysis.db"
+DB_PATH = PROJECT_ROOT / "data" / "analysis.db"
+conn = sqlite3.connect(DB_PATH)
+
 df_panel = pd.read_csv("../data/processed/full_panel.csv")
 df_panel.to_sql("panel", conn, if_exists="replace", index=False)
 

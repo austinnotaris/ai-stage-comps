@@ -6,7 +6,7 @@ import sys
 ROOT = Path(__file__).resolve().parent
 sys.path.append(str(ROOT / "src"))
 
-from .company_blueprint import Company
+from src.company_blueprint import Company
 
 REQUIRED_COLS = [
     "name",
