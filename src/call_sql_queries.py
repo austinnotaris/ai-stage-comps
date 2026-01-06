@@ -11,8 +11,9 @@ import sqlite3
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_ROOT / "data" / "analysis.db"
 conn = sqlite3.connect(DB_PATH)
+PANEL_PATH = PROJECT_ROOT / "data" / "processed" / "full_panel.csv"
 
-df_panel = pd.read_csv("../data/processed/full_panel.csv")
+df_panel = pd.read_csv(PANEL_PATH)
 df_panel.to_sql("panel", conn, if_exists="replace", index=False)
 
 def coverage_by_growth(GB):
