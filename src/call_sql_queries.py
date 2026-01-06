@@ -12,15 +12,17 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_ROOT / "data" / "analysis.db"
 conn = sqlite3.connect(DB_PATH)
 PANEL_PATH = PROJECT_ROOT / "data" / "processed" / "full_panel.csv"
+SQL_DIR = PROJECT_ROOT / "sql"
+
 
 df_panel = pd.read_csv(PANEL_PATH)
 df_panel.to_sql("panel", conn, if_exists="replace", index=False)
 
 def coverage_by_growth(GB):
+    sql_cbg = (SQL_DIR / "coverage_by_growth.sql").read_text()
     CB = None
     MB = None
     RB = None
-    sql_cbg = Path("../sql/coverage_by_growth.sql").read_text()
     check = check_bucket_params(GB, CB, MB, RB)
     if check["Growth Bucket"] != "Valid" or check["Capex Bucket"] != "Valid" or check["Margin Bucket"] != "Valid" or check["Revenue Bucket"] != "Valid":
         return check
@@ -33,10 +35,10 @@ def coverage_by_growth(GB):
         return df
 
 def coverage_by_margin(MB):
+    sql_cbm = (SQL_DIR / "coverage_by_margin.sql").read_text()
     CB = None
     GB = None
     RB = None
-    sql_cbm = Path("../sql/coverage_by_margin.sql").read_text()
     check = check_bucket_params(GB, CB, MB, RB)
     if check["Growth Bucket"] != "Valid" or check["Capex Bucket"] != "Valid" or check["Margin Bucket"] != "Valid" or check["Revenue Bucket"] != "Valid":
         return check
@@ -49,10 +51,10 @@ def coverage_by_margin(MB):
         return df
 
 def coverage_by_revenue(RB):
+    sql_cbr = (SQL_DIR / "sql/coverage_by_revenue.sql").read_text()
     CB = None
     MB = None
     GB = None
-    sql_cbr = Path("../sql/coverage_by_revenue.sql").read_text()
     check = check_bucket_params(GB, CB, MB, RB)
     if check["Growth Bucket"] != "Valid" or check["Capex Bucket"] != "Valid" or check["Margin Bucket"] != "Valid" or check["Revenue Bucket"] != "Valid":
         return check
@@ -65,7 +67,7 @@ def coverage_by_revenue(RB):
         return df
 
 def coverage_by_regime(GB, CB, MB, RB, MinObs, MaxObs):
-    sql_cbregime = Path("../sql/coverage_by_regime.sql").read_text()
+    sql_cbregime = (SQL_DIR / "coverage_by_regime.sql").read_text()
     check = check_bucket_params(GB, CB, MB, RB)
     if check["Growth Bucket"] != "Valid" or check["Capex Bucket"] != "Valid" or check["Margin Bucket"] != "Valid" or check["Revenue Bucket"] != "Valid":
         return check
@@ -83,8 +85,8 @@ def coverage_by_regime(GB, CB, MB, RB, MinObs, MaxObs):
         return df
 
 def coverage_by_regime_minus_capex(GB, MB, RB, MinObs, MaxObs):
+    sql_cbrmc = (SQL_DIR / "coverage_by_regime_minus_capex.sql").read_text()
     CB = None
-    sql_cbrmc = Path("../sql/coverage_by_regime_minus_capex.sql").read_text()
     check = check_bucket_params(GB, CB, MB, RB)
     if check["Growth Bucket"] != "Valid" or check["Capex Bucket"] != "Valid" or check["Margin Bucket"] != "Valid" or check["Revenue Bucket"] != "Valid":
         return check
@@ -101,7 +103,7 @@ def coverage_by_regime_minus_capex(GB, MB, RB, MinObs, MaxObs):
         return df
 
 def valuation_by_regime(GB, CB, MB, RB, MinEVR, MaxEVR):
-    sql_vbr = Path("../sql/valuation_by_regime.sql").read_text()
+    sql_vbr = (SQL_DIR / "valuation_by_regime.sql").read_text()
     check = check_bucket_params(GB, CB, MB, RB)
     if check["Growth Bucket"] != "Valid" or check["Capex Bucket"] != "Valid" or check["Margin Bucket"] != "Valid" or check["Revenue Bucket"] != "Valid":
         return check
@@ -119,7 +121,7 @@ def valuation_by_regime(GB, CB, MB, RB, MinEVR, MaxEVR):
         return df
 
 def valuation_by_growth_capex():
-    sql_vbgc = Path("../sql/valuation_by_growth_capex.sql").read_text()
+    sql_vbgc = (SQL_DIR / "valuation_by_growth_capex.sql").read_text()
     df = pd.read_sql(sql_vbgc, conn)
     df = df.pivot(index="Growth Bucket", columns="Capex Bucket", values="Mean_EV_Rev")
     df = df[capex_buckets[1:]]
@@ -127,7 +129,7 @@ def valuation_by_growth_capex():
     return df
 
 def valuation_by_growth_margin():
-    sql_vbgm = Path("../sql/valuation_by_growth_margin.sql").read_text()
+    sql_vbgm = (SQL_DIR / "valuation_by_growth_margin.sql").read_text()
     df = pd.read_sql(sql_vbgm, conn)
     df = df.pivot(index="Growth Bucket", columns="Margin Bucket", values="Mean_EV_Rev")
     df = df[margin_buckets[1:]]
@@ -135,7 +137,7 @@ def valuation_by_growth_margin():
     return df
 
 def valuation_by_growth_revenue():
-    sql_vbgr = Path("../sql/valuation_by_growth_revenue.sql").read_text()
+    sql_vbgr = (SQL_DIR / "valuation_by_growth_revenue.sql").read_text()
     df = pd.read_sql(sql_vbgr, conn)
     df = df.pivot(index="Growth Bucket", columns="Revenue Bucket", values="Mean_EV_Rev")
     df = df[revenue_buckets[1:]]
@@ -159,7 +161,7 @@ def coverage_and_valuation_by_current_stage(GB, RB):
         return df
 
 def pull_comps_exact(GB, CB, MB, RB):
-    sql_pce = Path("../sql/pull_comps_exact.sql").read_text()
+    sql_pce = (SQL_DIR / "pull_comps_exact.sql").read_text()
     check = check_bucket_params(GB, CB, MB, RB)
     if check["Growth Bucket"] != "Valid" or check["Capex Bucket"] != "Valid" or check["Margin Bucket"] != "Valid" or check["Revenue Bucket"] != "Valid":
         return check
@@ -174,8 +176,8 @@ def pull_comps_exact(GB, CB, MB, RB):
         return df
 
 def pull_comps_minus_capex(GB, MB, RB):
+    sql_pcmc = (SQL_DIR / "pull_comps_minus_capex.sql").read_text()
     CB = None
-    sql_pcmc = Path("../sql/pull_comps_minus_capex.sql").read_text()
     check = check_bucket_params(GB, CB, MB, RB)
     if check["Growth Bucket"] != "Valid" or check["Capex Bucket"] != "Valid" or check["Margin Bucket"] != "Valid" or check["Revenue Bucket"] != "Valid":
         return check
@@ -189,7 +191,7 @@ def pull_comps_minus_capex(GB, MB, RB):
         return df
 
 def pull_comps_fuzzy(GB, CB, MB, RB):
-    sql_pcf = Path("../sql/pull_comps_fuzzy.sql").read_text()
+    sql_pcf = (SQL_DIR / "pull_comps_fuzzy.sql").read_text()
     check = check_bucket_params(GB, CB, MB, RB)
     if check["Growth Bucket"] != "Valid" or check["Capex Bucket"] != "Valid" or check["Margin Bucket"] != "Valid" or check["Revenue Bucket"] != "Valid":
         return check
@@ -220,8 +222,8 @@ def pull_comps_fuzzy(GB, CB, MB, RB):
         return df
         
 def pull_comps_fuzzy_minus_capex(GB, MB, RB):
+    sql_pcfmc = (SQL_DIR / "pull_comps_fuzzy_minus_capex.sql").read_text()
     CB = None
-    sql_pcfmc = Path("../sql/pull_comps_fuzzy_minus_capex.sql").read_text()
     check = check_bucket_params(GB, CB, MB, RB)
     if check["Growth Bucket"] != "Valid" or check["Capex Bucket"] != "Valid" or check["Margin Bucket"] != "Valid" or check["Revenue Bucket"] != "Valid":
         return check
@@ -247,7 +249,7 @@ def pull_comps_fuzzy_minus_capex(GB, MB, RB):
         return df
 
 def pull_stage_comps(GB, RB):
-    sql_psc = Path("../sql/pull_stage_comps.sql").read_text()
+    sql_psc = (SQL_DIR / "pull_stage_comps.sql").read_text()
     CB = None
     MB = None
     check = check_bucket_params(GB, CB, MB, RB)
@@ -262,7 +264,7 @@ def pull_stage_comps(GB, RB):
         return df
 
 def pull_stage_comps_coverage_median_mean(GB, RB):
-    sql_psccmm = Path("../sql/pull_stage_comps_coverage_median_mean.sql").read_text()
+    sql_psccmm = (SQL_DIR / "pull_stage_comps_coverage_median_mean.sql").read_text()
     CB = None
     MB = None
     check = check_bucket_params(GB, CB, MB, RB)
@@ -278,7 +280,7 @@ def pull_stage_comps_coverage_median_mean(GB, RB):
         return df
 
 def pull_stage_comps_plus_margin_coverage_and_median(GB, MB, RB):
-    sql_pscpmcam = Path("../sql/pull_stage_comps_plus_margin_coverage_and_median.sql").read_text()
+    sql_pscpmcam = (SQL_DIR / "pull_stage_comps_plus_margin_coverage_and_median.sql").read_text()
     CB = None
     check = check_bucket_params(GB, CB, MB, RB)
     if check["Growth Bucket"] != "Valid" or check["Capex Bucket"] != "Valid" or check["Margin Bucket"] != "Valid" or check["Revenue Bucket"] != "Valid":
@@ -294,7 +296,7 @@ def pull_stage_comps_plus_margin_coverage_and_median(GB, MB, RB):
         return df
 
 def pull_stage_comps_coverage_and_median_by_margin_bracket(GB, RB):
-    sql_psccambmb = Path("../sql/pull_stage_comps_coverage_and_median_by_margin_bracket.sql").read_text()
+    sql_psccambmb = (SQL_DIR / "pull_stage_comps_coverage_and_median_by_margin_bracket.sql").read_text()
     CB = None
     MB = None
     check = check_bucket_params(GB, CB, MB, RB)
@@ -310,6 +312,3 @@ def pull_stage_comps_coverage_and_median_by_margin_bracket(GB, RB):
         df = pd.read_sql(sql_psccambmb, conn, params=params)
         df = df.rename(columns={"Num_Observations":"Num of Observations", "Median_EV_Rev":"Median EV/Rev"})
         return df
-def r(GB,RB):
-    GM = df_panel[df_panel["Growth Bucket"] == GB & df_panel["Revenue Bucket"] == RB]["Gross Margin %"].median()
-    return GM
