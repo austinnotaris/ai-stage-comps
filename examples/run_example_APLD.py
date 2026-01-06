@@ -22,7 +22,7 @@ def run_apld_example():
     out_dir = ROOT / "examples" / "APLD"
     run_company(apld, out_dir)
 
-    print(f"✅ APLD example written to: {out_dir.resolve()}")
+    print(f"APLD example written to: {out_dir.resolve()}")
 
 
 if __name__ == "__main__":

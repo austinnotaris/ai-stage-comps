@@ -9,7 +9,6 @@ sys.path.append(str(ROOT / "src"))
 from company_blueprint import Company
 from runner import validate_input, run_company
 
-
 def parse_args():
     p = argparse.ArgumentParser(
         description="Run stage-based comps analysis for one or more companies from a CSV input."
@@ -36,7 +35,8 @@ def main():
         raise FileNotFoundError(f"Input CSV not found: {input_path}")
 
     # Read as strings first; validate_input will coerce numeric columns
-    df = pd.read_csv(input_path, dtype=str)
+    df = pd.read_csv(input_path, dtype=str, encoding="utf-8-sig", sep="\t")
+    df.columns = df.columns.str.strip()
     df = validate_input(df)
 
     out_root.mkdir(parents=True, exist_ok=True)
