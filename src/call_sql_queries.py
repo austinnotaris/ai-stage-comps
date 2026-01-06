@@ -8,7 +8,7 @@ from bucket_orders import *
 
 import sqlite3
 
-DB_PATH = Path(__file__).resolve().parents[1] / "data" / "analysis.db"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DB_PATH = PROJECT_ROOT / "data" / "analysis.db"
 conn = sqlite3.connect(DB_PATH)
 
